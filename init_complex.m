@@ -5,9 +5,9 @@
 
 function model = init_complex(params)
 
-% fprintf(1, 'Creating a complex model... ');
+fprintf(1, 'Creating a complex model... ');
 
-% tic
+tic;
 
 % -------------------------------------------------------------------------
 % Imports Java packages.
@@ -261,11 +261,11 @@ model.component('comp1').mesh('mesh1').feature('edg2').feature('size1').set('hma
 model.component('comp1').mesh('mesh1').create('ftri1', 'FreeTri');
 model.component('comp1').mesh('mesh1').feature('ftri1').create('size1', 'Size');
 model.component('comp1').mesh('mesh1').feature('ftri1').set('method', 'del');
-model.component('comp1').mesh('mesh1').feature('ftri1').feature('size1').set('hauto', 1);
+% model.component('comp1').mesh('mesh1').feature('ftri1').feature('size1').set('hauto', 1);
 
-model.component('comp1').mesh('mesh1').create('bl1', 'BndLayer');
-model.component('comp1').mesh('mesh1').feature('bl1').create('blp', 'BndLayerProp');
-model.component('comp1').mesh('mesh1').feature('bl1').feature('blp').selection.named('geom1_borehole_wall_selection');
+% model.component('comp1').mesh('mesh1').create('bl1', 'BndLayer');
+% model.component('comp1').mesh('mesh1').feature('bl1').create('blp', 'BndLayerProp');
+% model.component('comp1').mesh('mesh1').feature('bl1').feature('blp').selection.named('geom1_borehole_wall_selection');
 
 model.component('comp1').mesh('mesh1').run;
 
@@ -304,7 +304,7 @@ model.sol('sol1').feature('t1').set('tout', 'tsteps');
 model.sol('sol1').feature('t1').feature('d1').set('linsolver', 'pardiso');
 model.sol('sol1').feature('t1').feature('d1').set('pivotperturb', 1.0E-13);
 
-model.study('std1').feature('time').set('usertol', true);
-model.study('std1').feature('time').set('rtol', '1e-3');
+% model.study('std1').feature('time').set('usertol', true);
+% model.study('std1').feature('time').set('rtol', '1e-3');
 
-% fprintf(1, 'Done in %.0f seconds.\n', toc);
+fprintf(1, 'Done in %.0f seconds.\n', toc);

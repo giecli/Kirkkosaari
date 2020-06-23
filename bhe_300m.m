@@ -26,15 +26,17 @@ k_soil = [1.7, 2.4];
 
 counter = 1;
 
-options = optimset('tolfun', 0.1, 'tolx', 1);
+options = optimset('display', 'iter', 'tolfun', 0.1, 'tolx', 1, 'plotfcn', {@plot_x, @plot_fval});
 
 fid = fopen('results_bhe_300m.csv', 'w');
 
-fprintf(fid, '%5s;%10s;%10s;%10s;%15s\n', '#', 'H_clay', 'H_soil', 'k_soil', 'Q_extraction');
+fprintf(fid, '#;H_clay;H_soil;k_soil;Q_extraction\n');
 
 for i = 1:length(H_clay)
     for j = 1:length(H_soil)
         for k = 1:length(k_soil)
+            
+            tic;
             
             params.H_clay = H_clay(i);
             params.H_soil = H_soil(j);
@@ -44,7 +46,11 @@ for i = 1:length(H_clay)
             
             Q_extraction = fminbnd(@(x)cost_function(model,x), 300, 30000, options);
             
-            fprintf(fid, '%5d;%10.0f;%10.0f;%10.2f;%15.3f\n', counter, H_clay(i), H_soil(j), k_soil(k), Q_extraction);
+            fprintf(fid, '%d;%.0f;%.0f;%.2f;%.3f\n', counter, H_clay(i), H_soil(j), k_soil(k), Q_extraction);
+            
+            t_elapsed = toc / 60;
+            
+            fprintf(1, 'i=%d H_clay=%.0f H_soil=%.0f k_soil=%.2f Q_extraction=%.3f t_elapsed=%.1f\n', counter, H_clay(i), H_soil(j), k_soil(k), Q_extraction, t_elapsed);
             
             counter = counter + 1;
             
