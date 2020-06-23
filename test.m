@@ -31,10 +31,10 @@ com.comsol.model.util.ModelUtil.showProgress(true);
 
 opts = optimset('display', 'iter', 'tolfun', 0.1, 'tolx', 1);
 
-model = init_simple(params);
-
-Q_extraction1 = fminbnd(@(x)cost_function(model,x), 4000, 8000, opts);
+% model = init_simple(params);
+% 
+% Q_extraction1 = fminbnd(@(x)cost_function(model,x), 4000, 8000, opts);
 
 model = init_complex(params);
 
-Q_extraction2 = fminbnd(@(x)cost_function(model,x), 4000, 8000, opts);
+Q_extraction2 = fminbnd(@(x)cost_function(model,x), 4000, 5000, opts);

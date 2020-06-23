@@ -4,7 +4,9 @@
 
 function model = init_complex(params)
 
-fprintf(1, 'Entered init_complex.\n');
+fprintf(1, 'Creating a complex model... ');
+
+tic
 
 % -------------------------------------------------------------------------
 % Imports Java packages.
@@ -266,4 +268,4 @@ model.sol('sol1').feature('t1').set('tout', 'tsteps');
 model.sol('sol1').feature('t1').feature('d1').set('linsolver', 'pardiso');
 model.sol('sol1').feature('t1').feature('d1').set('pivotperturb', 1.0E-13);
 
-fprintf(1, 'Exiting init_complex.\n');
+fprintf(1, 'Done in %.0f seconds.\n', toc);

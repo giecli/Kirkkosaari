@@ -2,9 +2,9 @@
 
 This repository contains MATLAB® code for the use of the Kirkkosaari project.
 
-## COMSOL vs. EED
+## Benchmark
 
-Optimizing the simple and complex COMSOL models with the following parameters
+Use the following parameters:
 
 ```
 params.d_borehole = 140e-3;
@@ -28,6 +28,14 @@ params.Cp_clay = 728;
 params.rho_clay = 2750;
 ```
 
-gives the result of 4687 W of constant heat extraction for 50 years
-which corresponds to 41 MWh/a of energy being extracted.
-However, for the same parameters, EED gives 51.2 MWh/a of energy for 50 years.
+Minimization of **the average borehole wall temperature (`T_ave`)**
+should give around 5928 W of constant heat extraction for 50 years
+which corresponds to 5928 W × 8760 h = 51.9 MWh of energy each year.
+
+Similarly, minimization of **the minimum borehole wall temperature (`T_min`)**
+should give around 4687 W of constant heat extraction for 50 years
+which corresponds to 4687 W × 8760 h = 41.1 MWh of energy each year.
+
+Setting up an EED model with the above parameters and solving the maximal
+extractable energy while not allowing the borehole wall temperature drop
+below 0 centigrades will give 51.2 MWh/a.
