@@ -30,21 +30,21 @@ options = optimset('tolfun', 0.1, 'tolx', 1);
 
 fid = fopen('results_bhe_300m.csv', 'w');
 
-fprintf(fid, '%5s;%10s;%10s;%10s;%15s\n', '#', 'H_soil', 'k_soil', 'H_clay', 'Q_extraction');
+fprintf(fid, '%5s;%10s;%10s;%10s;%15s\n', '#', 'H_clay', 'H_soil', 'k_soil', 'Q_extraction');
 
 for i = 1:length(H_clay)
     for j = 1:length(H_soil)
         for k = 1:length(k_soil)
             
+            params.H_clay = H_clay(i);
             params.H_soil = H_soil(j);
             params.k_soil = k_soil(k);
-            params.H_clay = H_clay(i);
             
             model = init_complex(params);
             
             Q_extraction = fminbnd(@(x)cost_function(model,x), 300, 30000, options);
             
-            fprintf(fid, '%5d;%10.0f;%10.2f;%10.0f;%15.3f\n', counter, H_soil(j), k_soil(k), H_clay(i), Q_extraction);
+            fprintf(fid, '%5d;%10.0f;%10.0f;%10.2f;%15.3f\n', counter, H_clay(i), H_soil(j), k_soil(k), Q_extraction);
             
             counter = counter + 1;
             
