@@ -1,7 +1,6 @@
 # Kirkkosaari
 
-This repository contains MATLAB(R) code for optimizing borehole
-heat exchanger models for the use of the Kirkkosaari project.
+This repository contains MATLAB® code for the use of the Kirkkosaari project.
 
 ## COMSOL vs. EED
 
