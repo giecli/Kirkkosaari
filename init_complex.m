@@ -1,12 +1,13 @@
 % =========================================================================
-% Creates a new model with soil and claystone layers above bedrock.
+% Creates a new complex model. A complex model comprises of soil and
+% claystone layers above the bedrock.
 % =========================================================================
 
 function model = init_complex(params)
 
-fprintf(1, 'Creating a complex model... ');
+% fprintf(1, 'Creating a complex model... ');
 
-tic
+% tic
 
 % -------------------------------------------------------------------------
 % Imports Java packages.
@@ -58,6 +59,9 @@ model.param.set('rho_clay', sprintf('%f[kg/m^3]', params.rho_clay));
 
 model.param.set('Q_extraction', sprintf('%f[W]', params.Q_extraction));
 
+model.param.set('hmax_vertical_edge', sprintf('%f[m]', params.hmax_vertical_edge));
+model.param.set('hmax_horizontal_edge', sprintf('%f[m]', params.hmax_horizontal_edge));
+
 % -------------------------------------------------------------------------
 % Creates the initial temperature function.
 % -------------------------------------------------------------------------
@@ -99,79 +103,100 @@ model.component('comp1').geom('geom1').run('fin');
 % Creates selections and updates the geometry with them.
 % -------------------------------------------------------------------------
 
-model.component('comp1').geom('geom1').create('wall_selection', 'BoxSelection');
-model.component('comp1').geom('geom1').feature('wall_selection').set('entitydim', 1);
-model.component('comp1').geom('geom1').feature('wall_selection').label('Borehole Wall Selection');
-model.component('comp1').geom('geom1').feature('wall_selection').set('xmin', 0);
-model.component('comp1').geom('geom1').feature('wall_selection').set('xmax', 'r_borehole');
-model.component('comp1').geom('geom1').feature('wall_selection').set('ymin', '-L_borehole');
-model.component('comp1').geom('geom1').feature('wall_selection').set('ymax', 0);
-model.component('comp1').geom('geom1').feature('wall_selection').set('condition', 'allvertices');
+model.component('comp1').geom('geom1').create('borehole_wall_selection', 'BoxSelection');
+model.component('comp1').geom('geom1').feature('borehole_wall_selection').set('entitydim', 1);
+model.component('comp1').geom('geom1').feature('borehole_wall_selection').label('Borehole Wall Selection');
+model.component('comp1').geom('geom1').feature('borehole_wall_selection').set('xmin', 0);
+model.component('comp1').geom('geom1').feature('borehole_wall_selection').set('xmax', 'r_borehole');
+model.component('comp1').geom('geom1').feature('borehole_wall_selection').set('ymin', '-L_borehole');
+model.component('comp1').geom('geom1').feature('borehole_wall_selection').set('ymax', 0);
+model.component('comp1').geom('geom1').feature('borehole_wall_selection').set('condition', 'allvertices');
 
-model.component('comp1').geom('geom1').create('surface_selection', 'BoxSelection');
-model.component('comp1').geom('geom1').feature('surface_selection').set('entitydim', 1);
-model.component('comp1').geom('geom1').feature('surface_selection').label('Ground Surface Selection');
-model.component('comp1').geom('geom1').feature('surface_selection').set('xmin', 0);
-model.component('comp1').geom('geom1').feature('surface_selection').set('xmax', 'R_model');
-model.component('comp1').geom('geom1').feature('surface_selection').set('ymin', 0);
-model.component('comp1').geom('geom1').feature('surface_selection').set('ymax', 0);
-model.component('comp1').geom('geom1').feature('surface_selection').set('condition', 'allvertices');
+model.component('comp1').geom('geom1').create('ground_surface_selection', 'BoxSelection');
+model.component('comp1').geom('geom1').feature('ground_surface_selection').set('entitydim', 1);
+model.component('comp1').geom('geom1').feature('ground_surface_selection').label('Ground Surface Selection');
+model.component('comp1').geom('geom1').feature('ground_surface_selection').set('xmin', 0);
+model.component('comp1').geom('geom1').feature('ground_surface_selection').set('xmax', 'R_model');
+model.component('comp1').geom('geom1').feature('ground_surface_selection').set('ymin', 0);
+model.component('comp1').geom('geom1').feature('ground_surface_selection').set('ymax', 0);
+model.component('comp1').geom('geom1').feature('ground_surface_selection').set('condition', 'allvertices');
 
-model.component('comp1').geom('geom1').create('bottom_selection', 'BoxSelection');
-model.component('comp1').geom('geom1').feature('bottom_selection').set('entitydim', 1);
-model.component('comp1').geom('geom1').feature('bottom_selection').label('Bottom Boundary Selection');
-model.component('comp1').geom('geom1').feature('bottom_selection').set('xmin', 0);
-model.component('comp1').geom('geom1').feature('bottom_selection').set('xmax', 'R_model');
-model.component('comp1').geom('geom1').feature('bottom_selection').set('ymin', '-H_model');
-model.component('comp1').geom('geom1').feature('bottom_selection').set('ymax', '-H_model');
-model.component('comp1').geom('geom1').feature('bottom_selection').set('condition', 'allvertices');
+model.component('comp1').geom('geom1').create('bottom_boundary_selection', 'BoxSelection');
+model.component('comp1').geom('geom1').feature('bottom_boundary_selection').set('entitydim', 1);
+model.component('comp1').geom('geom1').feature('bottom_boundary_selection').label('Bottom Boundary Selection');
+model.component('comp1').geom('geom1').feature('bottom_boundary_selection').set('xmin', 0);
+model.component('comp1').geom('geom1').feature('bottom_boundary_selection').set('xmax', 'R_model');
+model.component('comp1').geom('geom1').feature('bottom_boundary_selection').set('ymin', '-H_model');
+model.component('comp1').geom('geom1').feature('bottom_boundary_selection').set('ymax', '-H_model');
+model.component('comp1').geom('geom1').feature('bottom_boundary_selection').set('condition', 'allvertices');
 
-model.component('comp1').geom('geom1').create('soil_selection', 'BoxSelection');
-model.component('comp1').geom('geom1').feature('soil_selection').label('Soil Domain Selection');
-model.component('comp1').geom('geom1').feature('soil_selection').set('xmin', 0);
-model.component('comp1').geom('geom1').feature('soil_selection').set('xmax', 'R_model');
-model.component('comp1').geom('geom1').feature('soil_selection').set('ymin', '-H_soil');
-model.component('comp1').geom('geom1').feature('soil_selection').set('ymax', 0);
-model.component('comp1').geom('geom1').feature('soil_selection').set('condition', 'allvertices');
+model.component('comp1').geom('geom1').create('soil_domain_selection', 'BoxSelection');
+model.component('comp1').geom('geom1').feature('soil_domain_selection').label('Soil Domain Selection');
+model.component('comp1').geom('geom1').feature('soil_domain_selection').set('xmin', 0);
+model.component('comp1').geom('geom1').feature('soil_domain_selection').set('xmax', 'R_model');
+model.component('comp1').geom('geom1').feature('soil_domain_selection').set('ymin', '-H_soil');
+model.component('comp1').geom('geom1').feature('soil_domain_selection').set('ymax', 0);
+model.component('comp1').geom('geom1').feature('soil_domain_selection').set('condition', 'allvertices');
 
-model.component('comp1').geom('geom1').create('clay_selection', 'BoxSelection');
-model.component('comp1').geom('geom1').feature('clay_selection').label('Clay Domain Selection');
-model.component('comp1').geom('geom1').feature('clay_selection').set('xmin', 0);
-model.component('comp1').geom('geom1').feature('clay_selection').set('xmax', 'R_model');
-model.component('comp1').geom('geom1').feature('clay_selection').set('ymin', '-H_soil-H_clay');
-model.component('comp1').geom('geom1').feature('clay_selection').set('ymax', '-H_soil');
-model.component('comp1').geom('geom1').feature('clay_selection').set('condition', 'allvertices');
+model.component('comp1').geom('geom1').create('clay_domain_selection', 'BoxSelection');
+model.component('comp1').geom('geom1').feature('clay_domain_selection').label('Clay Domain Selection');
+model.component('comp1').geom('geom1').feature('clay_domain_selection').set('xmin', 0);
+model.component('comp1').geom('geom1').feature('clay_domain_selection').set('xmax', 'R_model');
+model.component('comp1').geom('geom1').feature('clay_domain_selection').set('ymin', '-H_soil-H_clay');
+model.component('comp1').geom('geom1').feature('clay_domain_selection').set('ymax', '-H_soil');
+model.component('comp1').geom('geom1').feature('clay_domain_selection').set('condition', 'allvertices');
+
+model.component('comp1').geom('geom1').create('horizontal_edge_selection', 'BoxSelection');
+model.component('comp1').geom('geom1').feature('horizontal_edge_selection').set('entitydim', 1);
+model.component('comp1').geom('geom1').feature('horizontal_edge_selection').label('Horizontal Edge Selection');
+model.component('comp1').geom('geom1').feature('horizontal_edge_selection').set('xmin', 0);
+model.component('comp1').geom('geom1').feature('horizontal_edge_selection').set('xmax', 'r_borehole');
+model.component('comp1').geom('geom1').feature('horizontal_edge_selection').set('ymin', '-L_borehole');
+model.component('comp1').geom('geom1').feature('horizontal_edge_selection').set('ymax', '-L_borehole');
+model.component('comp1').geom('geom1').feature('horizontal_edge_selection').set('condition', 'allvertices');
+
+model.component('comp1').geom('geom1').create('vertical_edge_selection', 'BoxSelection');
+model.component('comp1').geom('geom1').feature('vertical_edge_selection').set('entitydim', 1);
+model.component('comp1').geom('geom1').feature('vertical_edge_selection').label('Vertical Edge Selection');
+model.component('comp1').geom('geom1').feature('vertical_edge_selection').set('xmin', 'r_borehole');
+model.component('comp1').geom('geom1').feature('vertical_edge_selection').set('xmax', 'r_borehole');
+model.component('comp1').geom('geom1').feature('vertical_edge_selection').set('ymin', '-L_borehole');
+model.component('comp1').geom('geom1').feature('vertical_edge_selection').set('ymax', 0);
+model.component('comp1').geom('geom1').feature('vertical_edge_selection').set('condition', 'allvertices');
 
 model.component('comp1').geom('geom1').run;
 
 % -------------------------------------------------------------------------
-% Creates variables and component couplings.
+% Creates component couplings and variables.
 % -------------------------------------------------------------------------
+
+model.component('comp1').cpl.create('minop1', 'Minimum');
+model.component('comp1').cpl('minop1').label('Borehole Wall Minimum Operator');
+model.component('comp1').cpl('minop1').selection.named('geom1_borehole_wall_selection');
+
+model.component('comp1').cpl.create('aveop1', 'Average');
+model.component('comp1').cpl('aveop1').label('Borehole Wall Average Operator');
+model.component('comp1').cpl('aveop1').selection.named('geom1_borehole_wall_selection');
+model.component('comp1').cpl('aveop1').set('axisym', true);
+
+model.component('comp1').cpl.create('intop1', 'Integration');
+model.component('comp1').cpl('intop1').label('Borehole Wall Integration Operator');
+model.component('comp1').cpl('intop1').selection.named('geom1_borehole_wall_selection');
+model.component('comp1').cpl('intop1').set('axisym', true);
 
 model.component('comp1').variable.create('var1');
 
 model.component('comp1').variable('var1').set('T_min', 'minop1(T)');
-model.component('comp1').cpl.create('minop1', 'Minimum');
-model.component('comp1').cpl('minop1').label('Borehole Wall Minimum Operator');
-model.component('comp1').cpl('minop1').selection.named('geom1_wall_selection');
-
 model.component('comp1').variable('var1').set('T_ave', 'aveop1(T)');
-model.component('comp1').cpl.create('aveop1', 'Average');
-model.component('comp1').cpl('aveop1').label('Borehole Wall Average Operator');
-model.component('comp1').cpl('aveop1').selection.named('geom1_wall_selection');
-model.component('comp1').cpl('aveop1').set('axisym', true);
-
 model.component('comp1').variable('var1').set('A_wall', 'intop1(1)');
-model.component('comp1').cpl.create('intop1', 'Integration');
-model.component('comp1').cpl('intop1').label('Borehole Wall Integration Operator');
-model.component('comp1').cpl('intop1').selection.named('geom1_wall_selection');
-model.component('comp1').cpl('intop1').set('axisym', true);
 
 % -------------------------------------------------------------------------
 % Creates the physics.
 % -------------------------------------------------------------------------
 
 model.component('comp1').physics.create('ht', 'HeatTransfer', 'geom1');
+
+model.component('comp1').physics('ht').prop('ShapeProperty').set('order_temperature', 1);
 
 model.component('comp1').physics('ht').feature('solid1').set('k_mat', 'userdef');
 model.component('comp1').physics('ht').feature('solid1').set('k', {'k_rock'; '0'; '0'; '0'; 'k_rock'; '0'; '0'; '0'; 'k_rock'});
@@ -184,19 +209,19 @@ model.component('comp1').physics('ht').feature('init1').set('Tinit', 'T_initial(
 
 model.component('comp1').physics('ht').create('hf1', 'HeatFluxBoundary', 1);
 model.component('comp1').physics('ht').feature('hf1').label('Borehole Wall Heat Flux');
-model.component('comp1').physics('ht').feature('hf1').selection.named('geom1_wall_selection');
+model.component('comp1').physics('ht').feature('hf1').selection.named('geom1_borehole_wall_selection');
 model.component('comp1').physics('ht').feature('hf1').set('q0', '-Q_extraction/A_wall');
 
 model.component('comp1').physics('ht').create('temp1', 'TemperatureBoundary', 1);
-model.component('comp1').physics('ht').feature('temp1').selection.named('geom1_surface_selection');
+model.component('comp1').physics('ht').feature('temp1').selection.named('geom1_ground_surface_selection');
 model.component('comp1').physics('ht').feature('temp1').set('T0', 'T_surface');
 
 model.component('comp1').physics('ht').create('hf2', 'HeatFluxBoundary', 1);
-model.component('comp1').physics('ht').feature('hf2').selection.named('geom1_bottom_selection');
+model.component('comp1').physics('ht').feature('hf2').selection.named('geom1_bottom_boundary_selection');
 model.component('comp1').physics('ht').feature('hf2').set('q0', 'q_geothermal');
 
 model.component('comp1').physics('ht').create('solid2', 'SolidHeatTransferModel', 2);
-model.component('comp1').physics('ht').feature('solid2').selection.named('geom1_soil_selection');
+model.component('comp1').physics('ht').feature('solid2').selection.named('geom1_soil_domain_selection');
 
 model.component('comp1').physics('ht').feature('solid2').set('k_mat', 'userdef');
 model.component('comp1').physics('ht').feature('solid2').set('k', {'k_soil'; '0'; '0'; '0'; 'k_soil'; '0'; '0'; '0'; 'k_soil'});
@@ -206,7 +231,7 @@ model.component('comp1').physics('ht').feature('solid2').set('Cp_mat', 'userdef'
 model.component('comp1').physics('ht').feature('solid2').set('Cp', 'Cp_soil');
 
 model.component('comp1').physics('ht').create('solid3', 'SolidHeatTransferModel', 2);
-model.component('comp1').physics('ht').feature('solid3').selection.named('geom1_clay_selection');
+model.component('comp1').physics('ht').feature('solid3').selection.named('geom1_clay_domain_selection');
 
 model.component('comp1').physics('ht').feature('solid3').set('k_mat', 'userdef');
 model.component('comp1').physics('ht').feature('solid3').set('k', {'k_clay'; '0'; '0'; '0'; 'k_clay'; '0'; '0'; '0'; 'k_clay'});
@@ -220,16 +245,27 @@ model.component('comp1').physics('ht').feature('solid3').set('Cp', 'Cp_clay');
 % -------------------------------------------------------------------------
 
 model.component('comp1').mesh('mesh1').create('edg1', 'Edge');
-model.component('comp1').mesh('mesh1').feature('edg1').selection.named('geom1_wall_selection');
+model.component('comp1').mesh('mesh1').feature('edg1').selection.named('geom1_horizontal_edge_selection');
 model.component('comp1').mesh('mesh1').feature('edg1').create('size1', 'Size');
 model.component('comp1').mesh('mesh1').feature('edg1').feature('size1').set('custom', 'on');
-model.component('comp1').mesh('mesh1').feature('edg1').feature('size1').set('hmax', '20[mm]');
+model.component('comp1').mesh('mesh1').feature('edg1').feature('size1').set('hmax', 'hmax_horizontal_edge');
 model.component('comp1').mesh('mesh1').feature('edg1').feature('size1').set('hmaxactive', true);
+
+model.component('comp1').mesh('mesh1').create('edg2', 'Edge');
+model.component('comp1').mesh('mesh1').feature('edg2').selection.named('geom1_vertical_edge_selection');
+model.component('comp1').mesh('mesh1').feature('edg2').create('size1', 'Size');
+model.component('comp1').mesh('mesh1').feature('edg2').feature('size1').set('custom', 'on');
+model.component('comp1').mesh('mesh1').feature('edg2').feature('size1').set('hmax', 'hmax_vertical_edge');
+model.component('comp1').mesh('mesh1').feature('edg2').feature('size1').set('hmaxactive', true);
 
 model.component('comp1').mesh('mesh1').create('ftri1', 'FreeTri');
 model.component('comp1').mesh('mesh1').feature('ftri1').create('size1', 'Size');
 model.component('comp1').mesh('mesh1').feature('ftri1').set('method', 'del');
 model.component('comp1').mesh('mesh1').feature('ftri1').feature('size1').set('hauto', 1);
+
+model.component('comp1').mesh('mesh1').create('bl1', 'BndLayer');
+model.component('comp1').mesh('mesh1').feature('bl1').create('blp', 'BndLayerProp');
+model.component('comp1').mesh('mesh1').feature('bl1').feature('blp').selection.named('geom1_borehole_wall_selection');
 
 model.component('comp1').mesh('mesh1').run;
 
@@ -257,7 +293,7 @@ model.study('std1').feature('time').set('tlist', tlist);
 
 model.sol('sol1').attach('std1');
 model.sol('sol1').feature('v1').set('clist', {tlist '1e-6[a]'});
-model.sol('sol1').feature('t1').set('control', 'user');
+model.sol('sol1').feature('t1').set('control', 'time');
 model.sol('sol1').feature('t1').set('tunit', 'a');
 model.sol('sol1').feature('t1').set('tlist', tlist);
 model.sol('sol1').feature('t1').set('initialstepbdf', '1e-6');
@@ -268,4 +304,7 @@ model.sol('sol1').feature('t1').set('tout', 'tsteps');
 model.sol('sol1').feature('t1').feature('d1').set('linsolver', 'pardiso');
 model.sol('sol1').feature('t1').feature('d1').set('pivotperturb', 1.0E-13);
 
-fprintf(1, 'Done in %.0f seconds.\n', toc);
+model.study('std1').feature('time').set('usertol', true);
+model.study('std1').feature('time').set('rtol', '1e-3');
+
+% fprintf(1, 'Done in %.0f seconds.\n', toc);

@@ -27,6 +27,9 @@ params.Q_extraction = 4687.07;
 
 params.t_simulation = 50;
 
+params.hmax_vertical_edge = 20e-3;
+params.hmax_horizontal_edge = 10e-3;
+
 com.comsol.model.util.ModelUtil.showProgress(true);
 
 opts = optimset('display', 'iter', 'tolfun', 0.1, 'tolx', 1);
@@ -37,4 +40,6 @@ opts = optimset('display', 'iter', 'tolfun', 0.1, 'tolx', 1);
 
 model = init_complex(params);
 
-Q_extraction2 = fminbnd(@(x)cost_function(model,x), 4000, 5000, opts);
+% Q_extraction2 = fminbnd(@(x)cost_function(model,x), 4000, 5000, opts);
+
+mphsave(model, 'complex.mph');
