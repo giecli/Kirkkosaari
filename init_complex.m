@@ -1,3 +1,7 @@
+% =========================================================================
+% Creates a new model with soil and claystone layers above bedrock.
+% =========================================================================
+
 function model = init_complex(params)
 
 fprintf(1, 'Entered init_complex.\n');

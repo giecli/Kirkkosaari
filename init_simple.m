@@ -1,3 +1,7 @@
+% =========================================================================
+% Initializes model with only bedrock.
+% =========================================================================
+
 function model = init_simple(params)
 
 import com.comsol.model.*
