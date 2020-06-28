@@ -4,7 +4,7 @@ clear all
 close all
 
 params.d_borehole = 140e-3;
-params.L_borehole = 600;
+params.L_borehole = 2000;
 params.T_surface = 4.6;
 params.q_geothermal = 0.048;
 params.k_rock = 3.2;
@@ -30,9 +30,9 @@ counter = 1;
 
 options = optimset('display', 'iter', 'tolfun', 0.1, 'tolx', 1, 'plotfcn', {@plot_x, @plot_fval});
 
-fid = fopen('results_bhe_600m.csv', 'w');
+%fid = fopen('results_bhe_2000m.csv', 'w');
 
-fprintf(fid, '#;H_clay;H_soil;k_soil;Q_extraction\n');
+%fprintf(fid, '#;H_clay;H_soil;k_soil;Q_extraction\n');
 
 for i = 1:length(H_clay)
     for j = 1:length(H_soil)
@@ -46,16 +46,17 @@ for i = 1:length(H_clay)
             
             model = init_complex(params);
             
-            Q_extraction = fminbnd(@(x)cost_function(model,x), 4000, 8000, options);
+            %Q_extraction = fminbnd(@(x)cost_function(model,x), 17000, 25000, options);
+            Q_extraction = fminbnd(@(x)cost_function(model,x), 80000, 150000, options);
             
-            fprintf(fid, '%d;%.0f;%.0f;%.2f;%.3f\n', counter, H_clay(i), H_soil(j), k_soil(k), Q_extraction);
+            %fprintf(fid, '%d;%.0f;%.0f;%.2f;%.3f\n', counter, H_clay(i), H_soil(j), k_soil(k), Q_extraction);
             
             t_elapsed = toc / 60;
             
             fprintf(1, 'i=%d H_clay=%.0f H_soil=%.0f k_soil=%.2f Q_extraction=%.3f t_elapsed=%.1f\n', counter, H_clay(i), H_soil(j), k_soil(k), Q_extraction, t_elapsed);
             
             counter = counter + 1;
-            
+            return
         end
     end
 end

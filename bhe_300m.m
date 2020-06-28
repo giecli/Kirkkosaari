@@ -6,7 +6,7 @@ close all
 params.d_borehole = 140e-3;
 params.L_borehole = 300;
 params.T_surface = 4.6;
-params.q_geothermal = 0.042;
+params.q_geothermal = 0.048;
 params.k_rock = 3.2;
 params.Cp_rock = 728;
 params.rho_rock = 2750;
@@ -23,6 +23,8 @@ params.hmax_horizontal_edge = 10e-3;
 H_soil = [20, 40, 60, 80, 100, 120];
 H_clay = [50, 100, 200, 400, 600, 800, 1000];
 k_soil = [1.7, 2.4];
+
+com.comsol.model.util.ModelUtil.showProgress(true);
 
 counter = 1;
 
@@ -44,7 +46,7 @@ for i = 1:length(H_clay)
             
             model = init_complex(params);
             
-            Q_extraction = fminbnd(@(x)cost_function(model,x), 300, 30000, options);
+            Q_extraction = fminbnd(@(x)cost_function(model,x), 1000, 5000, options);
             
             fprintf(fid, '%d;%.0f;%.0f;%.2f;%.3f\n', counter, H_clay(i), H_soil(j), k_soil(k), Q_extraction);
             
