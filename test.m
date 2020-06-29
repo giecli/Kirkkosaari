@@ -3,6 +3,9 @@ clc
 clear all
 close all
 
+params.R_model = 500;
+params.H_model = 2500;
+
 params.T_surface = 7.0;
 params.q_geothermal = 0.040;
 
@@ -36,6 +39,12 @@ params.rho_fluid = 1000;
 
 params.Q_fluid = 0.6;
 params.Q_extraction = 70000;
+
+params.rtol = 1e-3;
+params.istep = 1e-6;
+
+params.h_buffer = 1;
+params.t_simulation = 50;
 
 com.comsol.model.util.ModelUtil.showProgress(true);
 
