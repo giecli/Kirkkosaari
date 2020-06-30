@@ -77,28 +77,39 @@ model.param.set('h_buffer', sprintf('%f[m]', params.h_buffer));
 % Creates the initial temperature function.
 % -------------------------------------------------------------------------
 
-model.func.create('an1', 'Analytic');
-model.func('an1').set('funcname', 'T_initial');
-model.func('an1').set('expr', 'T_surface-q_geothermal/k_rock*z');
-model.func('an1').set('args', {'z'});
-model.func('an1').set('argunit', 'm');
-model.func('an1').set('fununit', 'K');
+% model.func.create('an1', 'Analytic');
+% model.func('an1').set('funcname', 'T_initial');
+% model.func('an1').set('expr', 'T_surface-q_geothermal/k_rock*z');
+% model.func('an1').set('args', {'z'});
+% model.func('an1').set('argunit', 'm');
+% model.func('an1').set('fununit', 'K');
+
+model.func.create('pw1', 'Piecewise');
+model.func('pw1').set('funcname', 'T_initial');
+model.func('pw1').set('arg', 'z');
+model.func('pw1').set('extrap', 'interior');
+model.func('pw1').set('pieces', {'-H_soil' '0' 'T_surface-q_geothermal/k_soil*z'; '-H_soil-H_clay' '-H_soil' 'T_surface+q_geothermal/k_soil*H_soil-q_geothermal/k_clay*(z+H_soil)'; '-H_model' '-H_soil-H_clay' 'T_surface+q_geothermal/k_soil*H_soil+q_geothermal/k_clay*H_clay-q_geothermal/k_rock*(z+H_soil+H_clay)'});
+model.func('pw1').set('argunit', 'm');
+model.func('pw1').set('fununit', 'K');
 
 model.func.create('gp1', 'GaussianPulse');
+model.func('gp1').set('funcname', 'gaussian_pulse');
 model.func('gp1').set('location', '-0.5*L_borehole');
 model.func('gp1').set('sigma', '0.2*L_borehole');
 model.func('gp1').set('normalization', 'peak');
 
 model.func.create('an2', 'Analytic');
-model.func('an2').set('expr', 'max(min(gp1(z[1/m]),0.5),0.001)');
+model.func('an2').set('expr', 'max(min(gaussian_pulse(z[1/m]),0.5),0.001)');
+model.func('an2').set('funcname', 'mesh_size');
 model.func('an2').set('args', {'z'});
 model.func('an2').set('argunit', 'm');
 model.func('an2').set('fununit', 'K');
 model.func('an2').set('plotargs', {'z' '-L_borehole' '0'});
 
 model.func.create('step1', 'Step');
-model.func('step1').set('location', '1/365');
-model.func('step1').set('smooth', '2/365');
+model.func('step1').set('funcname', 'ramp_function');
+model.func('step1').set('location', '1/365.2425');
+model.func('step1').set('smooth', '1/182.62125');
 
 % -------------------------------------------------------------------------
 % Creates the geometry and runs it.
@@ -192,6 +203,7 @@ model.component('comp1').physics.create('ht', 'HeatTransfer', 'geom1');
 
 model.component('comp1').physics('ht').prop('ShapeProperty').set('order_temperature', 1);
 
+model.component('comp1').physics('ht').feature('solid1').label('Bedrock Solid');
 model.component('comp1').physics('ht').feature('solid1').set('k_mat', 'userdef');
 model.component('comp1').physics('ht').feature('solid1').set('k', {'k_rock'; '0'; '0'; '0'; 'k_rock'; '0'; '0'; '0'; 'k_rock'});
 model.component('comp1').physics('ht').feature('solid1').set('rho_mat', 'userdef');
@@ -204,14 +216,14 @@ model.component('comp1').physics('ht').feature('init1').set('Tinit', 'T_initial(
 i = get_boundaries([0.5*params.d_borehole 0], [params.R_model 0]);
 
 model.component('comp1').physics('ht').create('hf1', 'HeatFluxBoundary', 1);
-model.component('comp1').physics('ht').feature('hf1').label('Surface Heat Flux');
+model.component('comp1').physics('ht').feature('hf1').label('Surface Heat Flux BC');
 model.component('comp1').physics('ht').feature('hf1').selection.set(i);
 model.component('comp1').physics('ht').feature('hf1').set('q0', '-q_geothermal');
 
 i = get_boundaries([0 -params.H_model], [params.R_model -params.H_model]);
 
 model.component('comp1').physics('ht').create('hf2', 'HeatFluxBoundary', 1);
-model.component('comp1').physics('ht').feature('hf2').label('Bottom Heat Flux');
+model.component('comp1').physics('ht').feature('hf2').label('Bottom Heat Flux BC');
 model.component('comp1').physics('ht').feature('hf2').selection.set(i);
 model.component('comp1').physics('ht').feature('hf2').set('q0', 'q_geothermal');
 
@@ -244,7 +256,7 @@ i = get_domains([0 0], [0.5*params.d_inner -params.L_borehole]);
 model.component('comp1').physics('ht').create('fluid1', 'FluidHeatTransferModel', 2);
 model.component('comp1').physics('ht').feature('fluid1').label('Inner Fluid');
 model.component('comp1').physics('ht').feature('fluid1').selection.set(i);
-model.component('comp1').physics('ht').feature('fluid1').set('u', {'0'; '0'; 'step1(t[1/a])*v_inner'});
+model.component('comp1').physics('ht').feature('fluid1').set('u', {'0'; '0'; 'ramp_function(t[1/a])*v_inner'});
 model.component('comp1').physics('ht').feature('fluid1').set('k_mat', 'userdef');
 model.component('comp1').physics('ht').feature('fluid1').set('k', {'1000' '0' '0' '0' '1000' '0' '0' '0' 'k_fluid'});
 model.component('comp1').physics('ht').feature('fluid1').set('rho_mat', 'userdef');
@@ -271,7 +283,7 @@ i = get_domains([0.5*params.d_outer 0], [0.5*params.d_borehole -params.L_borehol
 model.component('comp1').physics('ht').create('fluid2', 'FluidHeatTransferModel', 2);
 model.component('comp1').physics('ht').feature('fluid2').label('Outer Fluid');
 model.component('comp1').physics('ht').feature('fluid2').selection.set(i);
-model.component('comp1').physics('ht').feature('fluid2').set('u', {'0'; '0'; '-step1(t[1/a])*v_outer'});
+model.component('comp1').physics('ht').feature('fluid2').set('u', {'0'; '0'; '-ramp_function(t[1/a])*v_outer'});
 model.component('comp1').physics('ht').feature('fluid2').set('k_mat', 'userdef');
 model.component('comp1').physics('ht').feature('fluid2').set('k', {'1000' '0' '0' '0' '1000' '0' '0' '0' 'k_fluid'});
 model.component('comp1').physics('ht').feature('fluid2').set('rho_mat', 'userdef');
@@ -284,14 +296,14 @@ model.component('comp1').physics('ht').feature('fluid2').set('gamma', '1');
 i = get_boundaries([0.5*params.d_outer 0], [0.5*params.d_borehole 0]);
 
 model.component('comp1').physics('ht').create('temp2', 'TemperatureBoundary', 1);
-model.component('comp1').physics('ht').feature('temp2').label('Top Inlet Temperature');
+model.component('comp1').physics('ht').feature('temp2').label('Top Inlet Temperature BC');
 model.component('comp1').physics('ht').feature('temp2').selection.set(i);
-model.component('comp1').physics('ht').feature('temp2').set('T0', 'T_outlet-step1(t[1/a])*delta_T');
+model.component('comp1').physics('ht').feature('temp2').set('T0', 'T_outlet-ramp_function(t[1/a])*delta_T');
 
 i = get_boundaries([0 -params.L_borehole], [0.5*params.d_inner -params.L_borehole]);
 
 model.component('comp1').physics('ht').create('temp3', 'TemperatureBoundary', 1);
-model.component('comp1').physics('ht').feature('temp3').label('Bottom Inlet Temperature');
+model.component('comp1').physics('ht').feature('temp3').label('Bottom Inlet Temperature BC');
 model.component('comp1').physics('ht').feature('temp3').selection.set(i);
 model.component('comp1').physics('ht').feature('temp3').set('T0', 'T_bottom');
 
@@ -320,7 +332,7 @@ l = get_boundaries([0.5*params.d_borehole 0], [0.5*params.d_borehole -params.L_b
 model.component('comp1').mesh('mesh1').create('edg2', 'Edge');
 model.component('comp1').mesh('mesh1').feature('edg2').selection.set([i j k l]);
 model.component('comp1').mesh('mesh1').feature('edg2').create('se1', 'SizeExpression');
-model.component('comp1').mesh('mesh1').feature('edg2').feature('se1').set('sizeexpr', 'an2(z)');
+model.component('comp1').mesh('mesh1').feature('edg2').feature('se1').set('sizeexpr', 'mesh_size(z)');
 
 i = get_domains([0 0], [0.5*params.d_borehole -params.L_borehole]);
 
@@ -419,8 +431,6 @@ model.sol('sol1').feature('t1').set('estrat', 'exclude');
 model.sol('sol1').feature('t1').set('tout', 'tsteps');
 model.sol('sol1').feature('t1').feature('dDef').set('linsolver', 'pardiso');
 model.sol('sol1').feature('t1').feature('dDef').set('pivotperturb', 1.0e-13);
-
-%model.sol('sol1').runAll;
 
     function i = get_boundaries(pt1, pt2)
         i = mphselectbox(model, 'geom1', [pt1(1) pt2(1); pt1(2) pt2(2)], 'boundary');

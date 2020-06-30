@@ -1,0 +1,34 @@
+300 m U-putki
+-------------
+HDPE
+----
+r_inner = 17.6 mm
+r_outer = 20 mm
+r_borehole = 114.3 mm
+Q_fluid = 0.5 L/s
+
+600 m U-putki
+-------------
+HDPE
+----
+r_inner = 22.1 mm / 25.7 mm
+r_outer =   25 mm / 31.5 mm
+Q_fluid = 0.6 L/s / 0.7 L/s
+
+r_borehole = 139.7 mm
+
+1000 & 2000 m koaksiaali
+------------------------
+r_borehole = 225 mm
+
+teräs
+-----
+r_outer = 62 mm
+r_inner = 38 mm
+k_pipe = 0.02 W/(m*K)
+Q_fluid = 
+
+HDPE
+----
+r_outer = 62.5 mm
+r_inner = 55.1 mm
