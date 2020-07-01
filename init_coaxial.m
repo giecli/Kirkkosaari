@@ -103,13 +103,13 @@ model.func('an2').set('expr', 'max(min(gaussian_pulse(z[1/m]),0.5),0.001)');
 model.func('an2').set('funcname', 'mesh_size');
 model.func('an2').set('args', {'z'});
 model.func('an2').set('argunit', 'm');
-model.func('an2').set('fununit', 'K');
+model.func('an2').set('fununit', 'm');
 model.func('an2').set('plotargs', {'z' '-L_borehole' '0'});
 
 model.func.create('step1', 'Step');
 model.func('step1').set('funcname', 'ramp_function');
-model.func('step1').set('location', '1/365.2425');
-model.func('step1').set('smooth', '1/182.62125');
+model.func('step1').set('location', '1/24');
+model.func('step1').set('smooth', '1/12');
 
 % -------------------------------------------------------------------------
 % Creates the geometry and runs it.

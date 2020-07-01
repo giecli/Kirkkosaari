@@ -50,11 +50,16 @@ model = init_coaxial(params);
 
 model.sol('sol1').runAll;
 
-mphsave(model, 'coaxial.mph');
+%mphsave(model, 'coaxial.mph');
 
-options = optimset('display', 'iter', 'tolfun', 0.1, 'tolx', 10, 'plotfcn', {@plot_x, @plot_fval});
+%options = optimset('display', 'iter', 'tolfun', 0.1, 'tolx', 10, 'plotfcn', {@plot_x, @plot_fval});
+options = optimset('display', 'iter', 'tolfun', 0.1, 'tolx', 10, 'plotfcn', @plot_xy);
 
-Q_extraction = fminbnd(@(x)cost_function(model,x), 80e3, 160e3, options)
+% Q_extraction = fminbnd(@(x)cost_function(model,x), 0.1, 10.0, options)
+
+x0 = [90000, 1]
+
+x = fminunc(@(x)cost_function(model,x), x0, options)
 
 si = mphsolinfo(model);
 t = si.solvals / (365.2425 * 24 * 3600);
