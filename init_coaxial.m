@@ -97,7 +97,7 @@ model.func('gp1').set('funcname', 'gaussian_pulse');
 model.func('gp1').set('location', '-0.5*L_borehole');
 model.func('gp1').set('sigma', '0.2*L_borehole');
 model.func('gp1').set('normalization', 'peak');
-xxx
+
 model.func.create('an2', 'Analytic');
 model.func('an2').set('expr', 'max(min(gaussian_pulse(z[1/m]),0.5),0.001)');
 model.func('an2').set('funcname', 'mesh_size');
@@ -108,8 +108,8 @@ model.func('an2').set('plotargs', {'z' '-L_borehole' '0'});
 
 model.func.create('step1', 'Step');
 model.func('step1').set('funcname', 'ramp_function');
-model.func('step1').set('location', '1/24');
-model.func('step1').set('smooth', '1/12');
+model.func('step1').set('location', '2/24');
+model.func('step1').set('smooth', '2/12');
 
 % -------------------------------------------------------------------------
 % Creates the geometry and runs it.
@@ -256,7 +256,7 @@ i = get_domains([0 0], [0.5*params.d_inner -params.L_borehole]);
 model.component('comp1').physics('ht').create('fluid1', 'FluidHeatTransferModel', 2);
 model.component('comp1').physics('ht').feature('fluid1').label('Inner Fluid');
 model.component('comp1').physics('ht').feature('fluid1').selection.set(i);
-model.component('comp1').physics('ht').feature('fluid1').set('u', {'0'; '0'; 'ramp_function(t[1/a])*v_inner'});
+model.component('comp1').physics('ht').feature('fluid1').set('u', {'0'; '0'; 'v_inner'});
 model.component('comp1').physics('ht').feature('fluid1').set('k_mat', 'userdef');
 model.component('comp1').physics('ht').feature('fluid1').set('k', {'1000' '0' '0' '0' '1000' '0' '0' '0' 'k_fluid'});
 model.component('comp1').physics('ht').feature('fluid1').set('rho_mat', 'userdef');
@@ -283,7 +283,7 @@ i = get_domains([0.5*params.d_outer 0], [0.5*params.d_borehole -params.L_borehol
 model.component('comp1').physics('ht').create('fluid2', 'FluidHeatTransferModel', 2);
 model.component('comp1').physics('ht').feature('fluid2').label('Outer Fluid');
 model.component('comp1').physics('ht').feature('fluid2').selection.set(i);
-model.component('comp1').physics('ht').feature('fluid2').set('u', {'0'; '0'; '-ramp_function(t[1/a])*v_outer'});
+model.component('comp1').physics('ht').feature('fluid2').set('u', {'0'; '0'; '-v_outer'});
 model.component('comp1').physics('ht').feature('fluid2').set('k_mat', 'userdef');
 model.component('comp1').physics('ht').feature('fluid2').set('k', {'1000' '0' '0' '0' '1000' '0' '0' '0' 'k_fluid'});
 model.component('comp1').physics('ht').feature('fluid2').set('rho_mat', 'userdef');
@@ -412,6 +412,7 @@ model.study('std1').feature('time').set('tunit', 'a');
 model.study('std1').feature('time').set('tlist', tlist);
 model.study('std1').feature('time').set('usertol', true);
 model.study('std1').feature('time').set('rtol', params.rtol);
+model.study('std1').setGenPlots(false);
 
 model.sol.create('sol1');
 model.sol('sol1').study('std1');
@@ -433,7 +434,7 @@ model.sol('sol1').feature('t1').feature('dDef').set('linsolver', 'pardiso');
 model.sol('sol1').feature('t1').feature('dDef').set('pivotperturb', 1.0e-13);
 
     function i = get_boundaries(pt1, pt2)
-        i = mphselectbox(model, 'geom1', [pt1(1) pt2(1); pt1(2) pt2(2)], 'boundary');
+        i = mphselectbox(model, 'geom1', [pt1(1)-0.001 pt2(1)+0.001; pt1(2)+0.001 pt2(2)-0.001], 'boundary');
         assert(~isempty(i));
     end
 

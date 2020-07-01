@@ -41,31 +41,37 @@ params.Q_fluid = 3;
 params.Q_extraction = 70000;
 
 params.rtol = 1e-3;
-params.h_buffer = 1;
+params.h_buffer = 5;
 params.t_simulation = 50;
 
 com.comsol.model.util.ModelUtil.showProgress(true);
 
 model = init_coaxial(params);
 
-model.sol('sol1').runAll;
+% mphsave(model, 'coaxial.mph');
 
-%mphsave(model, 'coaxial.mph');
+% model.sol('sol1').runAll;
 
 %options = optimset('display', 'iter', 'tolfun', 0.1, 'tolx', 10, 'plotfcn', {@plot_x, @plot_fval});
 options = optimset('display', 'iter', 'tolfun', 0.1, 'tolx', 10, 'plotfcn', @plot_xy);
 
-% Q_extraction = fminbnd(@(x)cost_function(model,x), 0.1, 10.0, options)
+x0 = [100e3, 1.5];
 
-x0 = [90000, 1]
+% x = fminbnd(@(x)cost_function(model,x), 0.1, 10.0, options)
+x = fminsearch(@(x)cost_function(model,x), x0, options)
 
-x = fminunc(@(x)cost_function(model,x), x0, options)
+% si = mphsolinfo(model);
+% t = si.solvals / (365.2425 * 24 * 3600);
+% T_min = mphglobal(model,'T_min','unit','degC');
+% Q_wall = mphglobal(model, 'Q_wall', 'unit', 'W');
+% figure;
+% semilogx(t, T_min);
+% figure;
+% semilogx(t, Q_wall);
 
-si = mphsolinfo(model);
-t = si.solvals / (365.2425 * 24 * 3600);
-T_min = mphglobal(model,'T_min','unit','degC');
-Q_wall = mphglobal(model, 'Q_wall', 'unit', 'W');
-figure;
-semilogx(t, T_min);
-figure;
-semilogx(t, Q_wall);
+% a = linspace(0, 500000, 100);
+% b = linspace(0, 25, 100);
+% [a, b] = meshgrid(a, b);
+% surf(a,b,rost_function(a,b))
+% x = fminsearchbnd(@(x)rost_function(x), x0, lb, ub, options)
+% x = fminunc(@(x)rost_function(x), x0, options)
