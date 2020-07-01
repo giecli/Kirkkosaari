@@ -97,7 +97,7 @@ model.func('gp1').set('funcname', 'gaussian_pulse');
 model.func('gp1').set('location', '-0.5*L_borehole');
 model.func('gp1').set('sigma', '0.2*L_borehole');
 model.func('gp1').set('normalization', 'peak');
-
+xxx
 model.func.create('an2', 'Analytic');
 model.func('an2').set('expr', 'max(min(gaussian_pulse(z[1/m]),0.5),0.001)');
 model.func('an2').set('funcname', 'mesh_size');
